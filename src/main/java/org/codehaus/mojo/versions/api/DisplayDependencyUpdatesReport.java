@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class DependencyUpdates {
+public class DisplayDependencyUpdatesReport {
     private final Map<String,List<ArtifactUpdate>> updatePerSectionMap = new HashMap<String, List<ArtifactUpdate>>(2);
 
     public void addUpdate(String section, ArtifactUpdate update){

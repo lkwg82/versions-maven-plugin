@@ -19,7 +19,6 @@ package org.codehaus.mojo.versions;
  * under the License.
  */
 
-import com.thoughtworks.xstream.XStream;
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.versioning.ArtifactVersion;
@@ -29,16 +28,15 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.codehaus.mojo.versions.api.ArtifactUpdate;
 import org.codehaus.mojo.versions.api.ArtifactVersions;
-import org.codehaus.mojo.versions.api.DependencyUpdates;
+import org.codehaus.mojo.versions.api.DisplayDependencyUpdatesReport;
 import org.codehaus.mojo.versions.api.UpdateScope;
 import org.codehaus.mojo.versions.rewriting.ModifiedPomXMLEventReader;
 import org.codehaus.mojo.versions.utils.DependencyComparator;
-import org.codehaus.plexus.util.FileUtils;
+import org.codehaus.mojo.versions.utils.ObjectToXmlWriter;
 import org.codehaus.plexus.util.StringUtils;
 
 import javax.xml.stream.XMLStreamException;
 import java.io.File;
-import java.io.IOException;
 import java.util.*;
 
 /**
@@ -100,9 +98,10 @@ public class DisplayDependencyUpdatesMojo
     /**
      * holds dependency updates per section
      */
-    private DependencyUpdates updatePerSectionMap = new DependencyUpdates();
+    private DisplayDependencyUpdatesReport report = new DisplayDependencyUpdatesReport();
 
     // --------------------- GETTER / SETTER METHODS ---------------------
+
     public void setXmlReport(File xmlReport) {
         this.xmlReport = xmlReport;
     }
@@ -204,7 +203,7 @@ public class DisplayDependencyUpdatesMojo
                 logUpdates( getHelper().lookupDependenciesUpdates( dependencies, false ), "Dependencies" );
             }
 
-            writeXmlReport(updatePerSectionMap);
+            ObjectToXmlWriter.writeXmlReport(xmlReport, report);
         }
         catch ( InvalidVersionSpecificationException e )
         {
@@ -316,22 +315,7 @@ public class DisplayDependencyUpdatesMojo
                 }
             }
 
-            updatePerSectionMap.addUpdate(section, new ArtifactUpdate(entry.getKey(),latest));
-        }
-    }
-
-    private void writeXmlReport(DependencyUpdates updatePerSectionMap) {
-
-        if (null == xmlReport){
-            return; // skip this, xml report file is not set
-        }
-
-        final XStream xStream = new XStream();
-
-        try {
-            FileUtils.fileWrite(xmlReport.getAbsolutePath(), xStream.toXML(updatePerSectionMap));
-        } catch (IOException e) {
-            throw new IllegalStateException(e);
+            report.addUpdate(section, new ArtifactUpdate(entry.getKey(), latest));
         }
     }
 

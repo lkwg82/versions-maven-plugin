@@ -36,18 +36,9 @@ import org.apache.maven.lifecycle.Lifecycle;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.lifecycle.LifecycleExecutor;
 import org.apache.maven.lifecycle.mapping.LifecycleMapping;
-import org.apache.maven.model.Model;
-import org.apache.maven.model.Plugin;
-import org.apache.maven.model.Prerequisites;
-import org.apache.maven.model.Profile;
-import org.apache.maven.model.ReportPlugin;
+import org.apache.maven.model.*;
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
-import org.apache.maven.plugin.InvalidPluginException;
-import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.plugin.PluginManager;
-import org.apache.maven.plugin.PluginManagerException;
-import org.apache.maven.plugin.PluginNotFoundException;
+import org.apache.maven.plugin.*;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.plugin.version.PluginVersionNotFoundException;
 import org.apache.maven.plugin.version.PluginVersionResolutionException;
@@ -57,10 +48,10 @@ import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.project.interpolation.ModelInterpolationException;
 import org.apache.maven.project.interpolation.ModelInterpolator;
 import org.apache.maven.settings.Settings;
-import org.codehaus.mojo.versions.api.ArtifactVersions;
-import org.codehaus.mojo.versions.api.PomHelper;
+import org.codehaus.mojo.versions.api.*;
 import org.codehaus.mojo.versions.ordering.MavenVersionComparator;
 import org.codehaus.mojo.versions.rewriting.ModifiedPomXMLEventReader;
+import org.codehaus.mojo.versions.utils.ObjectToXmlWriter;
 import org.codehaus.mojo.versions.utils.PluginComparator;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.util.IOUtil;
@@ -69,28 +60,14 @@ import org.codehaus.plexus.util.StringUtils;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.XMLEvent;
+import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.Stack;
-import java.util.TreeMap;
-import java.util.TreeSet;
+import java.util.*;
 import java.util.regex.Pattern;
 
 /**
@@ -155,8 +132,20 @@ public class DisplayPluginUpdatesMojo
      */
     private RuntimeInformation runtimeInformation;
 
+    private DisplayPluginUpdatesReport report =new DisplayPluginUpdatesReport();
+
+    /**
+     * file to write xml report to
+     *
+     * @parameter expression="${xmlReport}" defaultValue="null"
+     */
+    private File xmlReport;
+
     // --------------------- GETTER / SETTER METHODS ---------------------
 
+    public void setXmlReport(File xmlReport) {
+        this.xmlReport = xmlReport;
+    }
     /**
      * Returns the pluginManagement section of the super-pom.
      *
@@ -651,6 +640,8 @@ public class DisplayPluginUpdatesMojo
                 }
                 buf.append( effectiveVersion );
                 lockdowns.add( buf.toString() );
+
+                addMissingVersionPlugin(groupId, artifactId, version);
             }
             else if ( artifactVersion != null )
             {
@@ -676,6 +667,8 @@ public class DisplayPluginUpdatesMojo
                 buf.append( " -> " );
                 buf.append( newVersion );
                 updates.add( buf.toString() );
+
+                addUpdate(groupId,artifactId,version,artifactVersion);
             }
         }
         getLog().info( "" );
@@ -711,6 +704,7 @@ public class DisplayPluginUpdatesMojo
         if ( noMavenMinVersion )
         {
             getLog().warn( "Project does not define minimum Maven version, default is: 2.0" );
+            report.warnNoMinimumVersion();
         }
         else if ( noExplicitMavenMinVersion )
         {
@@ -724,6 +718,9 @@ public class DisplayPluginUpdatesMojo
             {
                 getLog().error( "Project's effective minimum Maven (from parent) is: " + specMavenVersion );
                 getLog().error( "Project defines minimum Maven version as: " + explicitMavenVersion );
+
+                report.warn(new IncompatibleParentAndProjectMavenVersion(specMavenVersion,
+                        explicitMavenVersion));
             }
             else
             {
@@ -780,6 +777,9 @@ public class DisplayPluginUpdatesMojo
                 getLog().error( "    <prerequisites>" );
                 getLog().error( "      <maven>" + minMavenVersion + "</maven>" );
                 getLog().error( "    </prerequisites>" );
+
+                report.warn( new IncompatibleParentAndProjectMavenVersion(specMavenVersion,
+                        minMavenVersion));
             }
             else
             {
@@ -813,6 +813,27 @@ public class DisplayPluginUpdatesMojo
             }
         }
         getLog().info( "" );
+
+        ObjectToXmlWriter.writeXmlReport(xmlReport, report);
+    }
+
+    private void addUpdate(final String groupId, final String artifactId, final String version,
+                           final ArtifactVersion artifactVersion) {
+        Dependency dependency = createDependency(groupId, artifactId, version);
+        ArtifactUpdate update = new ArtifactUpdate(dependency, artifactVersion);
+        report.addPluginUpdate(update);
+    }
+    private void addMissingVersionPlugin(final String groupId, final String artifactId, final String version) {
+        Dependency dependency = createDependency(groupId, artifactId, version);
+        report.addMissingVersionPlugin(dependency);
+    }
+
+    private static Dependency createDependency(final String groupId, final String artifactId, final String version) {
+        Dependency dependency = new Dependency();
+        dependency.setGroupId(groupId);
+        dependency.setArtifactId(artifactId);
+        dependency.setVersion(version);
+        return dependency;
     }
 
     private String compactKey( String groupId, String artifactId )
