@@ -19,6 +19,7 @@ package org.codehaus.mojo.versions;
  * under the License.
  */
 
+import com.thoughtworks.xstream.XStream;
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.versioning.ArtifactVersion;
@@ -26,20 +27,19 @@ import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException
 import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.codehaus.mojo.versions.api.ArtifactUpdate;
 import org.codehaus.mojo.versions.api.ArtifactVersions;
+import org.codehaus.mojo.versions.api.DependencyUpdates;
 import org.codehaus.mojo.versions.api.UpdateScope;
 import org.codehaus.mojo.versions.rewriting.ModifiedPomXMLEventReader;
 import org.codehaus.mojo.versions.utils.DependencyComparator;
+import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.StringUtils;
 
 import javax.xml.stream.XMLStreamException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
+import java.io.File;
+import java.io.IOException;
+import java.util.*;
 
 /**
  * Displays all dependencies that have newer versions available.
@@ -90,7 +90,22 @@ public class DisplayDependencyUpdatesMojo
      */
     protected Boolean verbose = Boolean.FALSE;
 
+    /**
+     * file to write xml report to
+     *
+     * @parameter expression="${xmlReport}" defaultValue="null"
+     */
+    private File xmlReport;
+
+    /**
+     * holds dependency updates per section
+     */
+    private DependencyUpdates updatePerSectionMap = new DependencyUpdates();
+
     // --------------------- GETTER / SETTER METHODS ---------------------
+    public void setXmlReport(File xmlReport) {
+        this.xmlReport = xmlReport;
+    }
 
     /**
      * Returns a set of dependencies where the dependencies which are defined in the dependency management section have
@@ -149,7 +164,7 @@ public class DisplayDependencyUpdatesMojo
         // true if true or null
         return !Boolean.FALSE.equals( verbose );
     }
-    
+
 // ------------------------ INTERFACE METHODS ------------------------
 
 // --------------------- Interface Mojo ---------------------
@@ -188,6 +203,8 @@ public class DisplayDependencyUpdatesMojo
             {
                 logUpdates( getHelper().lookupDependenciesUpdates( dependencies, false ), "Dependencies" );
             }
+
+            writeXmlReport(updatePerSectionMap);
         }
         catch ( InvalidVersionSpecificationException e )
         {
@@ -272,8 +289,51 @@ public class DisplayDependencyUpdatesMojo
             }
             getLog().info( "" );
         }
+
+        reportUpdatesToFile(updates,section);
     }
 
+    private void reportUpdatesToFile(final Map<Dependency, ArtifactVersions> updates, final String section) {
+
+        if (null == xmlReport){
+            return; // skip this, xml report file is not set
+        }
+
+        List<ArtifactUpdate> artiFactUpdates = new ArrayList<ArtifactUpdate>(updates.size());
+
+        for (Map.Entry<Dependency, ArtifactVersions> entry : updates.entrySet()) {
+            ArtifactVersions versions = entry.getValue();
+            ArtifactVersion latest = null;
+            if (versions.isCurrentVersionDefined()) {
+                latest = versions.getNewestUpdate(UpdateScope.ANY, Boolean.TRUE.equals(allowSnapshots));
+            } else {
+                ArtifactVersion newestVersion = versions.getNewestVersion(versions.getArtifact().getVersionRange(), Boolean.TRUE.equals(allowSnapshots));
+                if (newestVersion != null) {
+                    latest = versions.getNewestUpdate(newestVersion, UpdateScope.ANY, Boolean.TRUE.equals(allowSnapshots));
+                    if (ArtifactVersions.isVersionInRange(latest, versions.getArtifact().getVersionRange())) {
+                        continue; // we skip this update, as it is excluded per configuration
+                    }
+                }
+            }
+
+            updatePerSectionMap.addUpdate(section, new ArtifactUpdate(entry.getKey(),latest));
+        }
+    }
+
+    private void writeXmlReport(DependencyUpdates updatePerSectionMap) {
+
+        if (null == xmlReport){
+            return; // skip this, xml report file is not set
+        }
+
+        final XStream xStream = new XStream();
+
+        try {
+            FileUtils.fileWrite(xmlReport.getAbsolutePath(), xStream.toXML(updatePerSectionMap));
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        }
+    }
 
     /**
      * @param pom the pom to update.
@@ -291,6 +351,4 @@ public class DisplayDependencyUpdatesMojo
     {
         // do nothing
     }
-
-
 }
