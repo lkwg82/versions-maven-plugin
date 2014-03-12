@@ -2,12 +2,12 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>org.codehaus.mojo</groupId>
-    <artifactId>mojo-parent</artifactId>
-    <version>32</version>
+    <groupId>org.sonatype.oss</groupId>
+    <artifactId>oss-parent</artifactId>
+    <version>7</version>
   </parent>
 
-  <groupId>de.lgohlke.mojo</groupId>
+  <groupId>de.lgohlke</groupId>
   <artifactId>versions-maven-plugin</artifactId>
   <version>2.2-SNAPSHOT</version>
   <packaging>maven-plugin</packaging>
@@ -80,16 +80,20 @@
   </prerequisites>
 
   <scm>
-    <connection>scm:svn:https://svn.codehaus.org/mojo/tags/versions-maven-plugin-2.1</connection>
-    <developerConnection>scm:svn:https://svn.codehaus.org/mojo/tags/versions-maven-plugin-2.1</developerConnection>
-    <url>http://fisheye.codehaus.org/browse/mojo/tags/versions-maven-plugin-2.1</url>
+    <connection>scm:git:git@github.com:lkwg82/versions-maven-plugin.git</connection>
+    <developerConnection>scm:git:git@github.com:lkwg82/versions-maven-plugin.git</developerConnection>
+    <url>git@github.com:lkwg82/versions-maven-plugin.git</url>
   </scm>
   <issueManagement>
-    <system>jira</system>
-    <url>http://jira.codehaus.org/browse/MVERSIONS</url>
+    <system>github</system>
+    <url>https://github.com/lkwg82/versions-maven-plugin/issues</url>
   </issueManagement>
 
   <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    <surefire.redirectTestOutputToFile>true</surefire.redirectTestOutputToFile>
+
     <mojo.java.target>1.5</mojo.java.target>
     <mavenVersion>2.2.1</mavenVersion>
     <wagonVersion>1.0-beta-6</wagonVersion>
@@ -410,9 +414,9 @@
 
   <reporting>
     <plugins>
-
       <plugin>
         <artifactId>maven-javadoc-plugin</artifactId>
+        <version>2.9.1</version>
         <configuration>
           <source>${mojo.java.target}</source>
         </configuration>
