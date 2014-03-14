@@ -7,7 +7,7 @@
     <version>7</version>
   </parent>
 
-  <groupId>de.lgohlke</groupId>
+  <groupId>de.lgohlke.mojo</groupId>
   <artifactId>versions-maven-plugin</artifactId>
   <version>2.1.2-SNAPSHOT</version>
   <packaging>maven-plugin</packaging>
