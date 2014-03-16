@@ -26,8 +26,9 @@ import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException
 import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.codehaus.mojo.versions.api.ArtifactUpdate;
-import org.codehaus.mojo.versions.api.DisplayParentUpdateReport;
+import org.codehaus.mojo.versions.report.ArtifactUpdate;
+import org.codehaus.mojo.versions.report.Dependency;
+import org.codehaus.mojo.versions.report.DisplayParentUpdateReport;
 import org.codehaus.mojo.versions.rewriting.ModifiedPomXMLEventReader;
 import org.codehaus.mojo.versions.utils.ObjectToXmlWriter;
 
@@ -87,7 +88,7 @@ public class DisplayParentUpdateMojo
             final Artifact parentArtifact = getProject().getParentArtifact();
 
 
-            final ArtifactUpdate.Dependency dependency = new ArtifactUpdate.Dependency();
+            final Dependency dependency = new Dependency();
             dependency.setGroupId(parentArtifact.getGroupId());
             dependency.setArtifactId(parentArtifact.getArtifactId());
             dependency.setVersion(currentVersion);

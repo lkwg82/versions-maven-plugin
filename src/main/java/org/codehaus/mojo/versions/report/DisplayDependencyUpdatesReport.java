@@ -1,4 +1,4 @@
-package org.codehaus.mojo.versions.api;
+package org.codehaus.mojo.versions.report;
 
 import java.util.ArrayList;
 import java.util.HashMap;

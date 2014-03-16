@@ -1,6 +1,4 @@
-package org.codehaus.mojo.versions.api;
-
-import org.apache.maven.model.Dependency;
+package org.codehaus.mojo.versions.report;
 
 import java.util.ArrayList;
 import java.util.List;

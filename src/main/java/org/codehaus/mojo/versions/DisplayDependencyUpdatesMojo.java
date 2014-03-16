@@ -26,9 +26,9 @@ import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException
 import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.codehaus.mojo.versions.api.ArtifactUpdate;
+import org.codehaus.mojo.versions.report.ArtifactUpdate;
 import org.codehaus.mojo.versions.api.ArtifactVersions;
-import org.codehaus.mojo.versions.api.DisplayDependencyUpdatesReport;
+import org.codehaus.mojo.versions.report.DisplayDependencyUpdatesReport;
 import org.codehaus.mojo.versions.api.UpdateScope;
 import org.codehaus.mojo.versions.rewriting.ModifiedPomXMLEventReader;
 import org.codehaus.mojo.versions.utils.DependencyComparator;
@@ -316,7 +316,7 @@ public class DisplayDependencyUpdatesMojo
             }
 
             final ArtifactUpdate update = new ArtifactUpdate();
-            final ArtifactUpdate.Dependency dependency = new ArtifactUpdate.Dependency();
+            final org.codehaus.mojo.versions.report.Dependency dependency = new org.codehaus.mojo.versions.report.Dependency();
             dependency.setGroupId(entry.getKey().getGroupId());
             dependency.setArtifactId(entry.getKey().getArtifactId());
             dependency.setScope(entry.getKey().getScope());

@@ -1,4 +1,4 @@
-package org.codehaus.mojo.versions.api;
+package org.codehaus.mojo.versions.report;
 
 public class IncompatibleParentAndProjectMavenVersion {
     private String parentVersion;

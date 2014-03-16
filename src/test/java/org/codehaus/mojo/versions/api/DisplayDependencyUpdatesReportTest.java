@@ -1,6 +1,9 @@
 package org.codehaus.mojo.versions.api;
 
 import com.thoughtworks.xstream.XStream;
+import org.codehaus.mojo.versions.report.ArtifactUpdate;
+import org.codehaus.mojo.versions.report.Dependency;
+import org.codehaus.mojo.versions.report.DisplayDependencyUpdatesReport;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -13,7 +16,7 @@ public class DisplayDependencyUpdatesReportTest {
 
         DisplayDependencyUpdatesReport report = new DisplayDependencyUpdatesReport();
 
-        final ArtifactUpdate.Dependency dependency = new ArtifactUpdate.Dependency();
+        final Dependency dependency = new Dependency();
         dependency.setGroupId("gr");
         dependency.setArtifactId("a");
         dependency.setScope("compile");

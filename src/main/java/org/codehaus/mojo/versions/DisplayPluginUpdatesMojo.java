@@ -48,8 +48,12 @@ import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.project.interpolation.ModelInterpolationException;
 import org.apache.maven.project.interpolation.ModelInterpolator;
 import org.apache.maven.settings.Settings;
-import org.codehaus.mojo.versions.api.*;
+import org.codehaus.mojo.versions.api.ArtifactVersions;
+import org.codehaus.mojo.versions.api.PomHelper;
 import org.codehaus.mojo.versions.ordering.MavenVersionComparator;
+import org.codehaus.mojo.versions.report.ArtifactUpdate;
+import org.codehaus.mojo.versions.report.DisplayPluginUpdatesReport;
+import org.codehaus.mojo.versions.report.IncompatibleParentAndProjectMavenVersion;
 import org.codehaus.mojo.versions.rewriting.ModifiedPomXMLEventReader;
 import org.codehaus.mojo.versions.utils.ObjectToXmlWriter;
 import org.codehaus.mojo.versions.utils.PluginComparator;
@@ -827,7 +831,7 @@ public class DisplayPluginUpdatesMojo
                            final ArtifactVersion artifactVersion) {
 
         ArtifactUpdate update = new ArtifactUpdate();
-        ArtifactUpdate.Dependency dependency = new ArtifactUpdate.Dependency();
+        org.codehaus.mojo.versions.report.Dependency dependency = new org.codehaus.mojo.versions.report.Dependency();
         dependency.setGroupId(groupId);
         dependency.setArtifactId(artifactId);
         dependency.setVersion(version);
@@ -837,17 +841,14 @@ public class DisplayPluginUpdatesMojo
 
         report.addPluginUpdate(update);
     }
-    private void addMissingVersionPlugin(final String groupId, final String artifactId, final String version) {
-        Dependency dependency = createDependency(groupId, artifactId, version);
-        report.addMissingVersionPlugin(dependency);
-    }
 
-    private static Dependency createDependency(final String groupId, final String artifactId, final String version) {
-        Dependency dependency = new Dependency();
+    private void addMissingVersionPlugin(final String groupId, final String artifactId, final String version) {
+        org.codehaus.mojo.versions.report.Dependency dependency = new org.codehaus.mojo.versions.report.Dependency();
         dependency.setGroupId(groupId);
         dependency.setArtifactId(artifactId);
         dependency.setVersion(version);
-        return dependency;
+
+        report.addMissingVersionPlugin(dependency);
     }
 
     private String compactKey( String groupId, String artifactId )
