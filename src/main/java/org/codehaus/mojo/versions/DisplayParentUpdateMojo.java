@@ -43,8 +43,7 @@ import java.io.File;
  * @since 2.1
  */
 public class DisplayParentUpdateMojo
-    extends UpdateParentMojo
-{
+        extends UpdateParentMojo {
     /**
      * file to write xml report to
      *
@@ -56,9 +55,8 @@ public class DisplayParentUpdateMojo
         this.xmlReport = xmlReport;
     }
 
-    protected void update( ModifiedPomXMLEventReader pom )
-        throws MojoExecutionException, MojoFailureException, XMLStreamException
-    {
+    protected void update(ModifiedPomXMLEventReader pom)
+            throws MojoExecutionException, MojoFailureException, XMLStreamException {
         if (hasParentPom() && !isPartOfReactorProject()) {
             String currentVersion = getProject().getParent().getVersion();
             String version = currentVersion;
@@ -87,7 +85,11 @@ public class DisplayParentUpdateMojo
 
             final Artifact parentArtifact = getProject().getParentArtifact();
 
-            DisplayParentUpdateReport report = new DisplayParentUpdateReport(parentArtifact, currentVersion, latestVersion.toString());
+            DisplayParentUpdateReport report = new DisplayParentUpdateReport();
+            report.setParentGroupId(parentArtifact.getGroupId());
+            report.setParentArtifactId(parentArtifact.getArtifactId());
+            report.setCurrentVersion(currentVersion);
+            report.setLatestVersion(null == latestVersion ? null : latestVersion.toString());
 
             ObjectToXmlWriter.writeXmlReport(xmlReport, report);
         }

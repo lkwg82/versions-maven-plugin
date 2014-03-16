@@ -1,27 +1,40 @@
 package org.codehaus.mojo.versions.api;
 
-import org.apache.maven.artifact.Artifact;
-
 public class DisplayParentUpdateReport {
-    private final Artifact parentArtifact;
-    private final String currentVersion;
-    private final String latestVersion;
-
-    public DisplayParentUpdateReport(Artifact parentArtifact, String currentVersion, String latestVersion) {
-        this.parentArtifact = parentArtifact;
-        this.currentVersion = currentVersion;
-        this.latestVersion = latestVersion;
-    }
+    private String currentVersion;
+    private String latestVersion;
+    private String groupId;
+    private String parentArtifactId;
 
     public String getCurrentVersion() {
         return currentVersion;
+    }
+
+    public void setCurrentVersion(String currentVersion) {
+        this.currentVersion = currentVersion;
     }
 
     public String getLatestVersion() {
         return latestVersion;
     }
 
-    public Artifact getParentArtifact() {
-        return parentArtifact;
+    public void setLatestVersion(String latestVersion) {
+        this.latestVersion = latestVersion;
+    }
+
+    public void setParentGroupId(String groupId) {
+        this.groupId = groupId;
+    }
+
+    public void setParentArtifactId(String parentArtifactId) {
+        this.parentArtifactId = parentArtifactId;
+    }
+
+    public String getGroupId() {
+        return groupId;
+    }
+
+    public String getParentArtifactId() {
+        return parentArtifactId;
     }
 }
