@@ -719,8 +719,11 @@ public class DisplayPluginUpdatesMojo
                 getLog().error( "Project's effective minimum Maven (from parent) is: " + specMavenVersion );
                 getLog().error( "Project defines minimum Maven version as: " + explicitMavenVersion );
 
-                report.warn(new IncompatibleParentAndProjectMavenVersion(specMavenVersion,
-                        explicitMavenVersion));
+                IncompatibleParentAndProjectMavenVersion incompatibleParentAndProjectMavenVersion = new IncompatibleParentAndProjectMavenVersion();
+                incompatibleParentAndProjectMavenVersion.setParentVersion(specMavenVersion.toString());
+                incompatibleParentAndProjectMavenVersion.setProjectVersion(explicitMavenVersion.toString());
+
+                report.warn(incompatibleParentAndProjectMavenVersion);
             }
             else
             {
@@ -778,8 +781,11 @@ public class DisplayPluginUpdatesMojo
                 getLog().error( "      <maven>" + minMavenVersion + "</maven>" );
                 getLog().error( "    </prerequisites>" );
 
-                report.warn( new IncompatibleParentAndProjectMavenVersion(specMavenVersion,
-                        minMavenVersion));
+                IncompatibleParentAndProjectMavenVersion incompatibleParentAndProjectMavenVersion = new IncompatibleParentAndProjectMavenVersion();
+                incompatibleParentAndProjectMavenVersion.setParentVersion(specMavenVersion.toString());
+                incompatibleParentAndProjectMavenVersion.setProjectVersion(minMavenVersion.toString());
+
+                report.warn(incompatibleParentAndProjectMavenVersion);
             }
             else
             {

@@ -1,13 +1,22 @@
 package org.codehaus.mojo.versions.api;
 
-import org.apache.maven.artifact.versioning.ArtifactVersion;
-
 public class IncompatibleParentAndProjectMavenVersion {
-    private final ArtifactVersion parentVersion;
-    private final ArtifactVersion projectVersion;
+    private String parentVersion;
+    private String projectVersion;
 
-    public IncompatibleParentAndProjectMavenVersion(ArtifactVersion parentVersion, ArtifactVersion projectVersion) {
+    public String getParentVersion() {
+        return parentVersion;
+    }
+
+    public void setParentVersion(String parentVersion) {
         this.parentVersion = parentVersion;
+    }
+
+    public String getProjectVersion() {
+        return projectVersion;
+    }
+
+    public void setProjectVersion(String projectVersion) {
         this.projectVersion = projectVersion;
     }
 }
