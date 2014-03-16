@@ -819,8 +819,16 @@ public class DisplayPluginUpdatesMojo
 
     private void addUpdate(final String groupId, final String artifactId, final String version,
                            final ArtifactVersion artifactVersion) {
-        Dependency dependency = createDependency(groupId, artifactId, version);
-        ArtifactUpdate update = new ArtifactUpdate(dependency, artifactVersion);
+
+        ArtifactUpdate update = new ArtifactUpdate();
+        ArtifactUpdate.Dependency dependency = new ArtifactUpdate.Dependency();
+        dependency.setGroupId(groupId);
+        dependency.setArtifactId(artifactId);
+        dependency.setVersion(version);
+
+        update.setDependency(dependency);
+        update.setVersionUpdate(artifactVersion.toString());
+
         report.addPluginUpdate(update);
     }
     private void addMissingVersionPlugin(final String groupId, final String artifactId, final String version) {

@@ -315,7 +315,24 @@ public class DisplayDependencyUpdatesMojo
                 }
             }
 
-            report.addUpdate(section, new ArtifactUpdate(entry.getKey(), latest));
+            final ArtifactUpdate update = new ArtifactUpdate();
+            final ArtifactUpdate.Dependency dependency = new ArtifactUpdate.Dependency();
+            dependency.setGroupId(entry.getKey().getGroupId());
+            dependency.setArtifactId(entry.getKey().getArtifactId());
+            dependency.setScope(entry.getKey().getScope());
+            dependency.setVersion(entry.getKey().getVersion());
+            dependency.setType(entry.getKey().getType());
+            dependency.setProjectId(getProject().getId());
+
+            // this is only possible with maven >= 3
+            for(String key : new String[]{"","groupId","artifactId","version"}){
+                dependency.addInputLocation(key,entry.getKey().getLocation(key));
+            }
+
+            update.setDependency(dependency);
+            update.setVersionUpdate(null == latest ? null : latest.toString());
+
+            report.addUpdate(section, update);
         }
     }
 

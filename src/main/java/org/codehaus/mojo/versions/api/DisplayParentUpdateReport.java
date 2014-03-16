@@ -1,40 +1,13 @@
 package org.codehaus.mojo.versions.api;
 
 public class DisplayParentUpdateReport {
-    private String currentVersion;
-    private String latestVersion;
-    private String groupId;
-    private String parentArtifactId;
+    private ArtifactUpdate update;
 
-    public String getCurrentVersion() {
-        return currentVersion;
+    public ArtifactUpdate getUpdate() {
+        return update;
     }
 
-    public void setCurrentVersion(String currentVersion) {
-        this.currentVersion = currentVersion;
-    }
-
-    public String getLatestVersion() {
-        return latestVersion;
-    }
-
-    public void setLatestVersion(String latestVersion) {
-        this.latestVersion = latestVersion;
-    }
-
-    public void setParentGroupId(String groupId) {
-        this.groupId = groupId;
-    }
-
-    public void setParentArtifactId(String parentArtifactId) {
-        this.parentArtifactId = parentArtifactId;
-    }
-
-    public String getGroupId() {
-        return groupId;
-    }
-
-    public String getParentArtifactId() {
-        return parentArtifactId;
+    public void setUpdate(ArtifactUpdate update) {
+        this.update = update;
     }
 }
